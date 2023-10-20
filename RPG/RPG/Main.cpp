@@ -10,6 +10,7 @@ void EnemyLevelsUp(int& _enemyLevel, int& _enemyStrenght, int& _enemyHealth);
 void Barr();
 void Say(string _toSay);
 void DisplayWinRound();
+void DisplayEnemyTookDamage(const int _damageTaken, const int _enemyHealth);
 bool GameLoop();
 void Clear();
 void DisplayEnemy(const int _enemyHealth);
@@ -30,34 +31,43 @@ int main()
 	return 0;
 }
 
-
-
-
 bool GameLoop()
 {
-	
+	int _deadCounter = 0;
 	int _def, _att, _hp, _mana;
 	InitializeStatsPerso(ClassChosen(), _def, _att, _hp, _mana);
 	int _enemyLevel, _enemyAtt, _enemyHp;	
 	InitializeStatsEnemy(_enemyLevel, _enemyAtt, _enemyHp);
 	Clear();
-	for (int _index = 1; _index < 5; _index++)
+	while(true)
 	{
+		//Garde en mémoire les stats de l'ennemi précédent pour pouvoir appliquer la fonction EnemyLevelsUp
+		int _memoryEnemyLevel = _enemyLevel, _memoryEnemyAtt = _enemyAtt, _memoryEnemyHp = _enemyHp;
 		DisplayEnemy(_enemyHp);
 		while (true)
 		{
 			ChoosenAction(_enemyHp, _att);
-			Clear();
-			DisplayEnemy(_enemyHp);
 			if (IsDead(_enemyHp))
 			{
+				_deadCounter += 1;
+				Clear();
+				DisplayWinRound();
+				AskWitchStatAdd(_def, _att,_hp);
+				Clear();
+				EnemyLevelsUp(_memoryEnemyLevel, _memoryEnemyAtt, _memoryEnemyHp);
+				_enemyLevel = _memoryEnemyLevel, _enemyAtt = _memoryEnemyAtt, _enemyHp = _memoryEnemyHp;
+
 				break;
 			}
 			Say("AU TOUR DE L'ENNEMI");
 			EnemyDealsDamage(_enemyAtt, _hp, _def);
 			if (IsDead(_hp))
 			{
+				Clear();
+				Barr();
 				Say("AHAHAHAHA TU ES MORT BOZO");
+				cout << "TU AS VAINCU EXACTEMENT " << _deadCounter << " ENNEMIS"<<endl;
+				Barr();
 				return 0;
 			}
 		}
@@ -69,14 +79,16 @@ bool GameLoop()
 void EnemyTakesDamage(int& _enemyHealth, const int _strenghtUser)
 {
 	_enemyHealth -= 10 + _strenghtUser * 5;
+	Clear();
+	DisplayEnemyTookDamage(10 + _strenghtUser * 5, _enemyHealth);
 }
 void EnemyDealsDamage(int _enemyStrenght, int& _healthUser, const int _defenseUser)
 {
 	Barr();
-	int _trueDamage = _enemyStrenght * 1.25;
-	int _reducedDamage = _enemyStrenght * 2 * (1 - _defenseUser / 100);
+	int _trueDamage = _enemyStrenght*0.75;
+	int _reducedDamage = _enemyStrenght * (1 - _defenseUser / 100);
 	cout << "L'ennemi vous mets une bastoss (ouch ça doit faire mal), et vous prenez " << _trueDamage + _reducedDamage << " Degats" << endl;
-	_healthUser = _trueDamage + _reducedDamage;
+	_healthUser -= _trueDamage + _reducedDamage;
 	cout << "Il vous reste donc " << _healthUser << " HP"<<endl;
 	Barr();
 }
@@ -124,21 +136,29 @@ void DisplayEnemy(const int _enemyHealth)
 	Barr();
 	cout << endl;
 }
+void DisplayEnemyTookDamage(const int _damageTaken, const int _enemyHealth)
+{
+	cout << endl;
+	Barr();
+	cout << "Votre ennemi a pris cher ! -" << _damageTaken << " HP \t Il a actuellement " << _enemyHealth << " HP" << endl;
+	Barr();
+	cout << endl;
+}
 
 //GREG
 int ClassChosen()
 {
 	int _choice;
 
-	cout << "Quel class veut tu prendre \t Tes stat : Defense  Attaque   Vie " << endl;
+	cout << "Quel classe veut tu prendre \t Tes stat : Defense  Attaque   Vie " << endl;
 
 	string _tab[4]
 	{
 
-		"1 : Guerrier \t\t\t\t\t2\t2\t3 ",
-		"2 : Mage \t\t\t\t\t1\t4\t2",
-		"3 : Assasin\t\t\t\t\t1\t5\t1",
-		"4 : Gardien\t\t\t\t\t3\t1\t3",
+		"1 : Guerrier \t\t\t\t\t2\t2\t125 ",
+		"2 : Mage \t\t\t\t\t1\t4\t100",
+		"3 : Assasin\t\t\t\t\t1\t5\t75",
+		"4 : Gardien\t\t\t\t\t3\t1\t125",
 	};
 
 
@@ -146,8 +166,9 @@ int ClassChosen()
 	{
 		cout << _tab[_index] << endl;
 	}
-	cout << "Quel est ton choix : ";
+	cout << "Quel est ton choix : " <<endl;
 	cin >> _choice;
+	cout << endl;
 
 	while (_choice < 1 || _choice >4)
 	{
@@ -160,16 +181,17 @@ int ClassChosen()
 void AskWitchStatAdd(int& _def, int& _att, int& _hp)
 {
 	int _statAdd;
-	cout << "Bravo tu a gagner quel stat veut tu ajouter" << endl;
-	DisplayStats(_def, _att, _hp);
-	cout << "Quel stat veut tu ameliorer" << endl;
-
+	Say("Tu es pass\x82 au niveau sup\x82rieur, tu peux choisir 2 stats à renforcer: ");
 	for (int _index = 0; _index < 2; _index++)
 	{
+		Say("Quelle stat veut tu augmenter ?");
+		DisplayStats(_def, _att, _hp);
 		cout << "1 : Defense +1 " << endl;
 		cout << "2 : Attaque +1 " << endl;
-		cout << "3 : Vie +1 " << endl;
+		cout << "3 : Vie +15 " << endl;
 		cin >> _statAdd;
+		cout << endl;
+
 		while (_statAdd < 1 || _statAdd >3)
 		{
 			cout << "Ceci est impossible" << endl;
@@ -177,14 +199,14 @@ void AskWitchStatAdd(int& _def, int& _att, int& _hp)
 		}
 		if (_statAdd == 1)
 		{
-			_def + 1;
+			_def += 1;
 		}
 		else if (_statAdd == 2)
 		{
-			_att + 1;
+			_att += 1;
 		}
 		else
-			_hp + 1;
+			_hp += 15;
 	}
 
 }
@@ -201,25 +223,25 @@ void InitializeStatsPerso(int _choce, int& _def, int& _att, int& _hp, int& _mana
 	case 1:
 		_def = 2;
 		_att = 2;
-		_hp = 3;
+		_hp = 125;
 		_mana = 100;
 		break;
 	case 2:
 		_def = 1;
 		_att = 4;
-		_hp = 2;
+		_hp = 100;
 		_mana = 150;
 		break;
 	case 3:
 		_def = 1;
 		_att = 5;
-		_hp = 1;
+		_hp = 75;
 		_mana = 75;
 		break;
 	case 4:
 		_def = 3;
 		_att = 1;
-		_hp = 3;
+		_hp = 125;
 		_mana = 80;
 		break;
 	}
@@ -242,4 +264,5 @@ void ChoosenAction(int& _enemyHealth, int _strenghtUser)
 	case 1:
 		EnemyTakesDamage(_enemyHealth, _strenghtUser);
 	}
+	
 }

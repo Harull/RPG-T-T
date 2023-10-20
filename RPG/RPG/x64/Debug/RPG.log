@@ -1,1 +1,4 @@
-﻿  RPG.vcxproj -> C:\Users\GIAC0411\Documents\GitHub\RPG-T-T\RPG\x64\Debug\RPG.exe
+﻿  Main.cpp
+C:\Users\GIAC0411\Documents\GitHub\RPG-T-T\RPG\RPG\Main.cpp(91,18): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\GIAC0411\Documents\GitHub\RPG-T-T\RPG\RPG\Main.cpp(105,26): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+  RPG.vcxproj -> C:\Users\GIAC0411\Documents\GitHub\RPG-T-T\RPG\x64\Debug\RPG.exe
