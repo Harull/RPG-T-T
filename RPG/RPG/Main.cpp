@@ -2,11 +2,12 @@
 #include <string>
 using namespace std;
 void ClassChosen();
-
+void AskWitchStatAdd(int& _def, int& _att, int& _hp);
 int main()
 {
 	ClassChosen();
-
+	AskWitchStatAdd(_def, _att, _hp);
+	system("cls");
 	return 0;
 }
 
@@ -46,4 +47,38 @@ void ClassChosen()
 		cout << "Cette class n'existe pas" << endl;
 		cin >> _choice;
 	}
+}
+
+
+void AskWitchStatAdd(int& _def, int& _att, int& _hp)
+{
+	int _statAdd;
+	cout << "Bravo tu a gagner quel stat veut tu ajouter" << endl;
+	cout << "Tes stat Actuelle : Defense Attaque Vie" << endl;
+	cout << "\t\t\t" << _def << "\t" << _att << "    " << _hp << endl;
+	cout << "Quel stat veut tu ameliorer" << endl;
+	
+	for (int _index = 0; _index < 2; _index++)
+	{
+		cout << "1 : Defense +1 " << endl;
+		cout << "2 : Attaque +1 " << endl;
+		cout << "3 : Vie +1 " << endl;
+		cin >> _statAdd;
+		while (_statAdd < 1 || _statAdd >3)
+		{
+			cout << "Ceci est impossible" << endl;
+			cin >> _statAdd;
+		}
+		if (_statAdd == 1)
+		{
+			_def + 1;
+		}
+		else if (_statAdd == 2)
+		{
+			_att + 1;
+		}
+		else
+			_hp + 1;
+	}
+	
 }
