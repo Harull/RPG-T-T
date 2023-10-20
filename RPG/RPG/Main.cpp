@@ -43,10 +43,9 @@ bool GameLoop()
 	Clear();
 	for (int _index = 1; _index < 5; _index++)
 	{
-
+		DisplayEnemy(_enemyHp);
 		while (true)
 		{
-			DisplayEnemy(_enemyHp);
 			ChoosenAction(_enemyHp, _att);
 			Clear();
 			DisplayEnemy(_enemyHp);
@@ -54,6 +53,7 @@ bool GameLoop()
 			{
 				break;
 			}
+			Say("AU TOUR DE L'ENNEMI");
 			EnemyDealsDamage(_enemyAtt, _hp, _def);
 			if (IsDead(_hp))
 			{
@@ -72,10 +72,13 @@ void EnemyTakesDamage(int& _enemyHealth, const int _strenghtUser)
 }
 void EnemyDealsDamage(int _enemyStrenght, int& _healthUser, const int _defenseUser)
 {
-	int _trueDamage = _enemyStrenght * 1.25 + 10;
+	Barr();
+	int _trueDamage = _enemyStrenght * 1.25;
 	int _reducedDamage = _enemyStrenght * 2 * (1 - _defenseUser / 100);
-	cout << "L'ennemi vous mets une bastoss (ouch ça doit faire mal), et vous prenez " << _trueDamage + _reducedDamage << " Degats";
+	cout << "L'ennemi vous mets une bastoss (ouch ça doit faire mal), et vous prenez " << _trueDamage + _reducedDamage << " Degats" << endl;
 	_healthUser = _trueDamage + _reducedDamage;
+	cout << "Il vous reste donc " << _healthUser << " HP"<<endl;
+	Barr();
 }
 bool IsDead(const int _health)
 {
