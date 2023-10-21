@@ -1,0 +1,5 @@
+﻿  Main.cpp
+D:\Users\Haru\Documents\GitHub\RPG-T-T\RPG\RPG\Main.cpp(73,21): warning C4244: 'initialisation' : conversion de 'double' en 'int', perte possible de données
+D:\Users\Haru\Documents\GitHub\RPG-T-T\RPG\RPG\Main.cpp(87,26): warning C4244: 'initialisation' : conversion de 'double' en 'int', perte possible de données
+D:\Users\Haru\Documents\GitHub\RPG-T-T\RPG\RPG\Main.cpp(120,16): warning C4267: 'initialisation' : conversion de 'size_t' en 'int', perte possible de données
+  RPG.vcxproj -> D:\Users\Haru\Documents\GitHub\RPG-T-T\RPG\x64\Debug\RPG.exe
