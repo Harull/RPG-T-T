@@ -1,4 +1,5 @@
 ﻿  Main.cpp
-C:\Users\GIAC0411\Documents\GitHub\RPG-T-T\RPG\RPG\Main.cpp(91,18): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-C:\Users\GIAC0411\Documents\GitHub\RPG-T-T\RPG\RPG\Main.cpp(105,26): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-  RPG.vcxproj -> C:\Users\GIAC0411\Documents\GitHub\RPG-T-T\RPG\x64\Debug\RPG.exe
+D:\Users\Haru\Documents\GitHub\RPG-T-T\RPG\RPG\Main.cpp(72,21): warning C4244: 'initialisation' : conversion de 'double' en 'int', perte possible de données
+D:\Users\Haru\Documents\GitHub\RPG-T-T\RPG\RPG\Main.cpp(86,26): warning C4244: 'initialisation' : conversion de 'double' en 'int', perte possible de données
+D:\Users\Haru\Documents\GitHub\RPG-T-T\RPG\RPG\Main.cpp(119,16): warning C4267: 'initialisation' : conversion de 'size_t' en 'int', perte possible de données
+  RPG.vcxproj -> D:\Users\Haru\Documents\GitHub\RPG-T-T\RPG\x64\Debug\RPG.exe

@@ -9,73 +9,56 @@ bool IsDead(const int _health);
 void EnemyLevelsUp(int& _enemyLevel, int& _enemyStrenght, int& _enemyHealth);
 void Barr();
 void Say(string _toSay);
-void DisplayWinRound();
-void DisplayEnemyTookDamage(const int _damageTaken, const int _enemyHealth);
-bool GameLoop();
+bool GameChoose();
 void Clear();
-void DisplayEnemy(const int _enemyHealth);
 int ClassChosen();
 void AskWitchStatAdd(int& _def, int& _att, int& _hp);
-void DisplayStats(const int _def, const int _att, const int _hp);
 void InitializeStatsPerso(int _choce, int& _def, int& _att, int& _hp, int& _mana);
-void InitializeStatsEnemy(int& _ennemiLevel, int& _enemiAtt, int& _enemiHp);
 void ChoosenAction(int& _enemyHealth, int _strenghtUser);
+void TypeSomethingToContinue(string& _forRandom);
+int RandomFromBagdad(string _strMultiplier, int _chosenRandom);
+bool AskGameMode();
+void InfiniteGame();
+void HistoryGame();
 
+
+//Displays
+void DisplayStatsBetter(const int _def, const int _att, const int _hp);
+void DisplayTitle(); //Affiche écran titre
+void DisplayWinRound(); //Nous informe qu'on a vaincu l'enemi
+void DisplayEnemyTookDamage(const int _damageTaken, const int _enemyHealth); //Nous montre les dégats subis par l'enemi
+void DisplayStats(const int _def, const int _att, const int _hp); //Affiche nos statistiques de joueur
+void DisplayEnemyHealth(const int _enemyHealth); //Nous indique pv de l'enemi
+void DisplayIntroductionTextMainStory();
 #pragma endregion
 
 
 int main()
 {
-	GameLoop();
+	GameChoose();
 	
 	return 0;
 }
 
-bool GameLoop()
+bool GameChoose()
 {
-	int _deadCounter = 0;
-	int _def, _att, _hp, _mana;
-	InitializeStatsPerso(ClassChosen(), _def, _att, _hp, _mana);
-	int _enemyLevel, _enemyAtt, _enemyHp;	
-	InitializeStatsEnemy(_enemyLevel, _enemyAtt, _enemyHp);
-	Clear();
-	while(true)
+	//Afiche l'écran titre
+	DisplayTitle();
+	if (AskGameMode())
 	{
-		//Garde en mémoire les stats de l'ennemi précédent pour pouvoir appliquer la fonction EnemyLevelsUp
-		int _memoryEnemyLevel = _enemyLevel, _memoryEnemyAtt = _enemyAtt, _memoryEnemyHp = _enemyHp;
-		DisplayEnemy(_enemyHp);
-		while (true)
-		{
-			ChoosenAction(_enemyHp, _att);
-			if (IsDead(_enemyHp))
-			{
-				_deadCounter += 1;
-				Clear();
-				DisplayWinRound();
-				AskWitchStatAdd(_def, _att,_hp);
-				Clear();
-				EnemyLevelsUp(_memoryEnemyLevel, _memoryEnemyAtt, _memoryEnemyHp);
-				_enemyLevel = _memoryEnemyLevel, _enemyAtt = _memoryEnemyAtt, _enemyHp = _memoryEnemyHp;
-
-				break;
-			}
-			Say("AU TOUR DE L'ENNEMI");
-			EnemyDealsDamage(_enemyAtt, _hp, _def);
-			if (IsDead(_hp))
-			{
-				Clear();
-				Barr();
-				Say("AHAHAHAHA TU ES MORT BOZO");
-				cout << "TU AS VAINCU EXACTEMENT " << _deadCounter << " ENNEMIS"<<endl;
-				Barr();
-				return 0;
-			}
-		}
+		Clear();
+		InfiniteGame();//Jouer au mode infini
 	}
-
+	else
+	{
+		Clear();
+		HistoryGame();//Jouer au mode histoire 
+	}
 	return 0;
-
 }
+
+
+
 void EnemyTakesDamage(int& _enemyHealth, const int _strenghtUser)
 {
 	_enemyHealth -= 10 + _strenghtUser * 5;
@@ -85,8 +68,9 @@ void EnemyTakesDamage(int& _enemyHealth, const int _strenghtUser)
 void EnemyDealsDamage(int _enemyStrenght, int& _healthUser, const int _defenseUser)
 {
 	Barr();
-	int _trueDamage = _enemyStrenght*0.75;
-	int _reducedDamage = _enemyStrenght * (1 - _defenseUser / 100);
+	int _trueDamage = _enemyStrenght;
+	int _reducedDamage = _enemyStrenght * (1-_defenseUser*7.5 / 100); 
+
 	cout << "L'ennemi vous mets une bastoss (ouch ça doit faire mal), et vous prenez " << _trueDamage + _reducedDamage << " Degats" << endl;
 	_healthUser -= _trueDamage + _reducedDamage;
 	cout << "Il vous reste donc " << _healthUser << " HP"<<endl;
@@ -105,12 +89,6 @@ void EnemyLevelsUp(int& _enemyLevel, int& _enemyStrenght, int& _enemyHealth)
 	_enemyStrenght += _enemyLevel * _strenghtMultiplier;
 	_enemyHealth += _enemyLevel * _healthMultplier;
 }
-void DisplayWinRound()
-{
-	Barr();
-	Say("OH MON DIEUUUU, vOuS aVeZ vAiNcU l'EnNeMi");
-	Barr();
-}
 void Say(string _toSay)
 {
 	cout << _toSay << endl;
@@ -122,17 +100,133 @@ void Barr()
 	{
 		_result += "\xCD";
 	}
-	cout << _result << endl;
+	cout << _result << endl << endl;
 }
 void Clear()
 {
 	system("cls");
 }
-void DisplayEnemy(const int _enemyHealth)
+void TypeSomethingToContinue(string& _forRandom)
+{
+	string _enter;
+	Say("<Type Something To Continue>");
+	cin >> _enter;
+	_forRandom += _enter; //On va se servir de ce paramètre dit "aléatoire" pour créer notre propre fonction random
+	Clear();
+}
+int RandomFromBagdad(string _strMultiplier, int _chosenRandom) //Donne un chiffre aléatoire entre 1 et x
+{
+	int _numChars = _strMultiplier.length();
+	int _formula = ((_numChars + 22) * (_numChars)-13);
+	return _formula % _chosenRandom + 1;
+}
+bool AskGameMode()//Return false si on choisi mode histoire, et true si mode vague infinie
+{
+	int _answer;
+	Barr();
+	Say("Choisissez votre mode de jeu ! ");
+	Say("1- Mode histoire (conseill\x82) \t 2- Mode Vague Infinie");
+	Barr();
+
+	bool _condition;
+	do
+	{
+		cin >> _answer;
+		cout << endl;
+		_condition = _answer != 1 && _answer != 2;
+		if (_condition)
+		{
+			Say("Votre reponse est incorrecte, choisissez votre mode de jeu en tappant 1 ou 2");
+		}
+	} while (_condition);
+	Clear();
+
+	return _answer - 1;
+}
+void InfiniteGame()
+{
+	//Initialisation des statistiques mc/ennemies
+	int _deadCounter = 0;
+	int _def, _att, _hp, _mana;
+	int _enemyLevel = 1, _enemyAtt = 10, _enemyHp = 55;
+
+	//Initialisation d'un string qu'on va utiliser pour notre random
+	string _forRandom;
+
+	//Choix de la classe
+	InitializeStatsPerso(ClassChosen(),_def, _att, _hp, _mana);
+	Clear();
+	while (true)
+	{
+		//Garde en mémoire les stats de l'ennemi précédent pour pouvoir appliquer la fonction EnemyLevelsUp
+		int _memoryEnemyLevel = _enemyLevel, _memoryEnemyAtt = _enemyAtt, _memoryEnemyHp = _enemyHp;
+		Say("UN TERRIBLE MONSTRE APPARAIT DEVANT VOUS");
+		cout << "C'est un monstre de niveau " << _enemyLevel << " !!!" <<endl;
+		while (true)
+		{
+			DisplayEnemyHealth(_enemyHp);
+			//Choisi l'attaque a utiliser, inflige dégats selon cette dernière, dislay les pvs restant de l'ennemi 
+			ChoosenAction(_enemyHp, _att);
+
+			//Si l'ennemi est mort
+			if (IsDead(_enemyHp))
+			{
+				//Incrémente notre compteur de kill
+				_deadCounter += 1;
+
+				//Affiche qu'on a tué notre adversaire
+				Clear();
+				DisplayWinRound();
+
+				//Nous demande quels stats augmenter x2
+				AskWitchStatAdd(_def, _att, _hp);
+				Clear();
+
+				//Augmente les stats de ton ennemi
+				EnemyLevelsUp(_memoryEnemyLevel, _memoryEnemyAtt, _memoryEnemyHp);
+				_enemyLevel = _memoryEnemyLevel, _enemyAtt = _memoryEnemyAtt, _enemyHp = _memoryEnemyHp;
+
+				break;
+			}
+
+			//L'enemi a survécu, au tour de l'enemi d'attaquer
+
+			TypeSomethingToContinue(_forRandom);
+			EnemyDealsDamage(_enemyAtt, _hp, _def);
+			TypeSomethingToContinue(_forRandom);
+
+			//Si notre joueur est mort, message de mort et arrêt du jeu, display kill counter
+			if (IsDead(_hp))
+			{
+				Clear();
+				Barr();
+				Say("AHAHAHAHA TU ES MORT BOZO");
+				cout << "TU AS VAINCU EXACTEMENT " << _deadCounter << " ENNEMIS" << endl;
+				Barr();
+				return;
+			}
+		}
+	}
+}
+void HistoryGame()
+{
+	return;
+}
+
+
+
+
+void DisplayWinRound()
+{
+	Barr();
+	Say("OH MON DIEUUUU, vOuS aVeZ vAiNcU l'EnNeMi");
+	Barr();
+}
+void DisplayEnemyHealth(const int _enemyHealth)
 {
 	cout << endl;
 	Barr();
-	cout << "Un ennemi est devant toi, il a actuellement " << _enemyHealth << " HP " << endl;
+	cout << "Ton ennemi possède " << _enemyHealth << " HP " << endl;
 	Barr();
 	cout << endl;
 }
@@ -141,9 +235,43 @@ void DisplayEnemyTookDamage(const int _damageTaken, const int _enemyHealth)
 	cout << endl;
 	Barr();
 	cout << "Votre ennemi a pris cher ! -" << _damageTaken << " HP \t Il a actuellement " << _enemyHealth << " HP" << endl;
+	Say("AU TOUR DE L'ENNEMI");
+	Barr();
+}
+void DisplayTitle()
+{
+	Say("   _____                             _        ____                 _");
+	Say("  |  __ \\                           ( )      / __ \\               | |");
+	Say("  | |__) |___  _ __ ___   __ _ _ __ |/ ___  | |  | |_   _  ___ ___| |_ ");
+	Say("  |  _  // _ \\| '_ ` _ \\ / _` | '_ \\  / __| | |  | | | | |/ _ / __| __|");
+	Say("  | | \\ | (_) | | | | | | (_| | | | | \\__ \\ | |__| | |_| |  __\\__ | |_");
+	Say("  |_|  \\_\\___/|_| |_| |_|\\__,_|_| |_| |___/  \\___\\_\\\\__,_|\\___|___/\\__|");
 	Barr();
 	cout << endl;
 }
+void DisplayIntroductionTextMainStory()
+{
+	Say("Bienvenue aventurier,");
+	Say("Vous `\x88tes le plus grand \x82ros de tout les temps, ayant pour terrifiant nom... ROMAIN ");
+	Say("Mais m\x88me un h\x82ros possede des faiblesses et des peurs, r\x82ussirez vous a les vaincre ?");
+	Say("L'avenir nous le dira, que la qu\x88te COMMENCE :D");
+	Barr();
+}
+void DisplayStatsBetter(const int _def, const int _att, const int _hp)
+{
+	Say("  __________________________");
+	cout << " | " << "      " << " | " << "      " << " | " << "      " << " | " << endl;
+	cout << " | " << "Def: " << _def << " | " << "Atk: " << _att << " | " << "Hp: " << _hp << " | " << endl;
+	cout << " |_" << "______" << "_|_" << "______" << "_|_" << "______" << "_| " << endl;
+	
+}
+
+
+
+
+
+
+
 
 //GREG
 int ClassChosen()
@@ -185,7 +313,7 @@ void AskWitchStatAdd(int& _def, int& _att, int& _hp)
 	for (int _index = 0; _index < 2; _index++)
 	{
 		Say("Quelle stat veut tu augmenter ?");
-		DisplayStats(_def, _att, _hp);
+		DisplayStatsBetter(_def, _att, _hp);
 		cout << "1 : Defense +1 " << endl;
 		cout << "2 : Attaque +1 " << endl;
 		cout << "3 : Vie +15 " << endl;
@@ -245,12 +373,6 @@ void InitializeStatsPerso(int _choce, int& _def, int& _att, int& _hp, int& _mana
 		_mana = 80;
 		break;
 	}
-}
-void InitializeStatsEnemy(int& _ennemiLevel, int& _enemiAtt, int& _enemiHp)
-{
-	_ennemiLevel = 1;
-	_enemiAtt = 10;
-	_enemiHp = 55;
 }
 void ChoosenAction(int& _enemyHealth, int _strenghtUser)
 {
