@@ -12,7 +12,7 @@ void Say(string _toSay);
 bool GameChoose();
 void Clear();
 int ClassChosen();
-void AskWitchStatAdd(int& _def, int& _att, int& _hp);
+void AskWitchStatAdd(int& _def, int& _att, int& _hp, string _forRandom);
 void InitializeStatsPerso(int _choce, int& _def, int& _att, int& _hp, int& _mana);
 void ChoosenAction(int& _enemyHealth, int _strenghtUser);
 void TypeSomethingToContinue(string& _forRandom);
@@ -20,6 +20,7 @@ int RandomFromBagdad(string _strMultiplier, int _chosenRandom);
 bool AskGameMode();
 void InfiniteGame();
 void HistoryGame();
+void DisplayDeath(const int _deadCounter, int& _coins);
 
 
 //Displays
@@ -71,7 +72,7 @@ void EnemyDealsDamage(int _enemyStrenght, int& _healthUser, const int _defenseUs
 	int _trueDamage = _enemyStrenght;
 	int _reducedDamage = _enemyStrenght * (1-_defenseUser*7.5 / 100); 
 
-	cout << "L'ennemi vous mets une bastoss (ouch ça doit faire mal), et vous prenez " << _trueDamage + _reducedDamage << " Degats" << endl;
+	cout << "L'ennemi vous mets une bastoss (ouch ca doit faire mal), et vous prenez " << _trueDamage + _reducedDamage << " Degats" << endl;
 	_healthUser -= _trueDamage + _reducedDamage;
 	cout << "Il vous reste donc " << _healthUser << " HP"<<endl;
 	Barr();
@@ -143,13 +144,23 @@ bool AskGameMode()//Return false si on choisi mode histoire, et true si mode vag
 
 	return _answer - 1;
 }
+void DisplayDeath(const int _deadCounter,int& _coins)
+{
+	Barr();
+	Say("AHAHAHAHA TU ES MORT BOZO");
+	cout << "TU AS VAINCU EXACTEMENT " << _deadCounter << " ENNEMIS" << endl;
+	_coins = _deadCounter * 10;
+	cout << "Tu obtiens donc " << _coins << " W-Bucks, nous te conseillons de les utiliser a la boutique" << endl;
+	Say("Cela te permettra peut etre de vaincre plus d'ennemis !");
+	Barr();
+}
 void InfiniteGame()
 {
 	//Initialisation des statistiques mc/ennemies
 	int _deadCounter = 0;
 	int _def, _att, _hp, _mana;
 	int _enemyLevel = 1, _enemyAtt = 10, _enemyHp = 55;
-
+	int _coins;
 	//Initialisation d'un string qu'on va utiliser pour notre random
 	string _forRandom;
 
@@ -158,8 +169,8 @@ void InfiniteGame()
 	Clear();
 	while (true)
 	{
-		//Garde en mémoire les stats de l'ennemi précédent pour pouvoir appliquer la fonction EnemyLevelsUp
-		int _memoryEnemyLevel = _enemyLevel, _memoryEnemyAtt = _enemyAtt, _memoryEnemyHp = _enemyHp;
+		//Garde en mémoire les stats de pv et de force de l'ennemi précédent pour pouvoir appliquer la fonction EnemyLevelsUp, car les variables peuvent être modifié en fonction des compétences futures
+		int _memoryEnemyAtt = _enemyAtt, _memoryEnemyHp = _enemyHp;
 		Say("UN TERRIBLE MONSTRE APPARAIT DEVANT VOUS");
 		cout << "C'est un monstre de niveau " << _enemyLevel << " !!!" <<endl;
 		while (true)
@@ -179,32 +190,32 @@ void InfiniteGame()
 				DisplayWinRound();
 
 				//Nous demande quels stats augmenter x2
-				AskWitchStatAdd(_def, _att, _hp);
+				AskWitchStatAdd(_def, _att, _hp, _forRandom);
 				Clear();
 
 				//Augmente les stats de ton ennemi
-				EnemyLevelsUp(_memoryEnemyLevel, _memoryEnemyAtt, _memoryEnemyHp);
-				_enemyLevel = _memoryEnemyLevel, _enemyAtt = _memoryEnemyAtt, _enemyHp = _memoryEnemyHp;
+				EnemyLevelsUp(_enemyLevel, _memoryEnemyAtt, _memoryEnemyHp);
+				//Garde en mémoire les stats du prochain ennemi
+				_enemyAtt = _memoryEnemyAtt, _enemyHp = _memoryEnemyHp;
 
 				break;
 			}
 
-			//L'enemi a survécu, au tour de l'enemi d'attaquer
+			//L'enemi a survécu, au tour de l'ennemi d'attaquer
 
 			TypeSomethingToContinue(_forRandom);
 			EnemyDealsDamage(_enemyAtt, _hp, _def);
-			TypeSomethingToContinue(_forRandom);
-
 			//Si notre joueur est mort, message de mort et arrêt du jeu, display kill counter
 			if (IsDead(_hp))
 			{
 				Clear();
-				Barr();
-				Say("AHAHAHAHA TU ES MORT BOZO");
-				cout << "TU AS VAINCU EXACTEMENT " << _deadCounter << " ENNEMIS" << endl;
-				Barr();
+				DisplayDeath(_enemyLevel, _coins);
+				TypeSomethingToContinue(_forRandom);
+				//Menu() avec 3 interfaces, 1 -=> Try Again , 2 -=> Shop, 3 -=> Quitter le jeu 
+				
 				return;
 			}
+			TypeSomethingToContinue(_forRandom);
 		}
 	}
 }
@@ -226,7 +237,7 @@ void DisplayEnemyHealth(const int _enemyHealth)
 {
 	cout << endl;
 	Barr();
-	cout << "Ton ennemi possède " << _enemyHealth << " HP " << endl;
+	cout << "Ton ennemi possede " << _enemyHealth << " HP " << endl;
 	Barr();
 	cout << endl;
 }
@@ -306,17 +317,43 @@ int ClassChosen()
 
 	return _choice;
 }
-void AskWitchStatAdd(int& _def, int& _att, int& _hp)
+void AskWitchStatAdd(int& _def, int& _att, int& _hp, string _forRandom)
 {
 	int _statAdd;
-	Say("Tu es pass\x82 au niveau sup\x82rieur, tu peux choisir 2 stats à renforcer: ");
+	Say("Tu es pass\x82 au niveau sup\x82rieur, tu peux choisir 2 stats a renforcer: ");
+
+	//Donne un chiffre pseudo-Aléatoire entre 1 et 3
+	int _thisStatIsDoubled = RandomFromBagdad(_forRandom, 3);
+	int _defProposition = 1, _attProposition = 1, _hpProposition = 15;
+	string _chanceDef="", _chanceAtt="", _chanceHp="";
+	//Fais fois 2 a la stats qui aura un bonus
+	switch (_thisStatIsDoubled)
+	{
+	case 1:
+		_defProposition *= 2;
+		_chanceDef = "(Bonus CHANCE)";
+		break;
+	case 2:
+		_attProposition *= 2;
+		_chanceAtt = "(Bonus CHANCE)";
+		break;
+	case 3:
+		_hpProposition += 10;
+		_chanceHp = "(Bonus CHANCE)";
+		break;
+	default:
+		break;
+	}
 	for (int _index = 0; _index < 2; _index++)
 	{
-		Say("Quelle stat veut tu augmenter ?");
+		Say("Quelle stat veux-tu augmenter ?");
 		DisplayStatsBetter(_def, _att, _hp);
-		cout << "1 : Defense +1 " << endl;
-		cout << "2 : Attaque +1 " << endl;
-		cout << "3 : Vie +15 " << endl;
+		cout << "1 : Defense +"<< _defProposition << " "  << _chanceDef<< endl;
+		cout << "2 : Attaque +"<< _attProposition << " " << _chanceAtt << endl;
+		cout << "3 : Vie +"<< _hpProposition << " " << _chanceHp <<endl;
+
+		_chanceDef = "", _chanceAtt = "", _chanceHp = "";
+
 		cin >> _statAdd;
 		cout << endl;
 
@@ -327,17 +364,19 @@ void AskWitchStatAdd(int& _def, int& _att, int& _hp)
 		}
 		if (_statAdd == 1)
 		{
-			_def += 1;
+			_def += _defProposition;
 		}
 		else if (_statAdd == 2)
 		{
-			_att += 1;
+			_att += _attProposition;
 		}
 		else
-			_hp += 15;
-	}
+			_hp += _hpProposition;
 
+		_defProposition = 1, _attProposition = 1, _hpProposition = 15;
+	}
 }
+
 void DisplayStats(const int _def, const int _att, const int _hp)
 {
 	cout << "Tes stat Actuelle : Defense Attaque Vie" << endl;
@@ -377,7 +416,7 @@ void InitializeStatsPerso(int _choce, int& _def, int& _att, int& _hp, int& _mana
 void ChoosenAction(int& _enemyHealth, int _strenghtUser)
 {
 	int _chose;
-	cout << "Que veut tu faire ? : ";
+	cout << "Que veux-tu faire ? : ";
 	cout << "1- Attaquer" << "\n";
 	Barr();
 	cin >> _chose;
@@ -385,6 +424,8 @@ void ChoosenAction(int& _enemyHealth, int _strenghtUser)
 	{
 	case 1:
 		EnemyTakesDamage(_enemyHealth, _strenghtUser);
-	}
-	
+		break;
+	default:
+		ChoosenAction(_enemyHealth, _strenghtUser);
+	}	
 }
