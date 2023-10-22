@@ -18,7 +18,7 @@ void ChoosenAction(int& _enemyHealth, int _strenghtUser);
 void ChoosenAction(int& _enemyHealth, int _strenghtUser, int _index, bool& isWinning);
 void TypeSomethingToContinue(string& _forRandom);
 void TypeSomethingToContinue();
-int RandomFromBagdad(string _strMultiplier, int _chosenRandom);
+int RandomFromBagdad(int _strMultiplier, int _modulo);
 bool AskGameMode();
 void InfiniteGame();
 void StoryGame();
@@ -335,11 +335,14 @@ void TypeSomethingToContinue()
 	cin >> _enter;
 	Clear();
 }
-int RandomFromBagdad(string _strMultiplier, int _modulo) //Donne un chiffre aléatoire entre 1 et x
+int RandomFromBagdad(int _strMultiplier, int _modulo) //Donne un chiffre aléatoire entre 1 et x
 {
-	unsigned int _seed= _strMultiplier.length();
-	unsigned int _a = 1664525, _c = 1013904223;
-	return (_a * _seed + _c) % _modulo + 1;
+	//algorithme: générateur congruentiel linéaire
+	//Vu que pas le droit include time / random
+	int _seed = _strMultiplier;
+	static int _state = _seed;
+	_state = (_state * 1103515245 + 12345) & 0x7FFFFFFF; //0x7FFFFFFF c'est le nombre max d'un int signé, assure avec le "&" que le résultat est positif
+	return 1 + (_state % _modulo);
 }
 bool AskGameMode()//Return false si on choisi mode histoire, et true si mode vague infinie
 {
@@ -363,8 +366,6 @@ bool AskGameMode()//Return false si on choisi mode histoire, et true si mode vag
 	Clear();
 	return _answer - 1;
 }
-
-
 void DisplayDeath(const int _deadCounter,int& _coins)
 {
 	Barr();
@@ -514,15 +515,16 @@ void AskWitchStatAdd(int& _def, int& _att, int& _hp, string _forRandom)
 	Say("Tu es pass\x82 au niveau sup\x82rieur, tu peux choisir 2 stats a renforcer: ");
 
 	//Donne un chiffre pseudo-Aléatoire entre 1 et 6, tu as donc une chance sur 2 d'avoir un bonus chance, et 1 chance sur 3 d'avoir celui souhaité
-	int _thisStatIsDoubled = RandomFromBagdad(_forRandom, 6);
+	int _thisStatIsDoubled = RandomFromBagdad(_forRandom.length(), 6);
 	int _defProposition = 1, _attProposition = 1, _hpProposition = 15;
 	string _luckDef="", _luckAtt="", _luckHp="";
 	
-	//Pour attribuer le ("Chance") a la stat doublé, et double également la stat concernée
-	SwitchLuck(_thisStatIsDoubled, _defProposition, _luckDef, _attProposition, _luckAtt, _hpProposition, _luckHp);
-
 	for (int _index = 0; _index < 2; _index++)
 	{
+		cout << _thisStatIsDoubled << endl;
+		//Pour attribuer le ("Chance") a la stat doublé, et double également la stat concernée
+		SwitchLuck(_thisStatIsDoubled, _defProposition, _luckDef, _attProposition, _luckAtt, _hpProposition, _luckHp);
+
 		Say("Quelle stat veux-tu augmenter ?");
 		DisplayStatsBetter(_def, _att, _hp);
 		cout << "1 : Defense +"<< _defProposition << " "  << _luckDef<< endl;
@@ -551,12 +553,11 @@ void AskWitchStatAdd(int& _def, int& _att, int& _hp, string _forRandom)
 			_hp += _hpProposition;
 
 		//Reset de la stat doublée
-		int _defProposition = 1, _attProposition = 1, _hpProposition = 15;
-		string _luckDef = "", _luckAtt = "", _luckHp = "";
+		_defProposition = 1, _attProposition = 1, _hpProposition = 15;
+		_luckDef = "", _luckAtt = "", _luckHp = "";
 
 		//Calcul de la prochaine stat a doubler
-		int _thisStatIsDoubled = RandomFromBagdad(_forRandom+"1", 6);
-		SwitchLuck(_thisStatIsDoubled, _defProposition, _luckDef, _attProposition, _luckAtt, _hpProposition, _luckHp);
+		_thisStatIsDoubled = RandomFromBagdad(_forRandom.length() + 2, 6);
 	}
 }
 void SwitchLuck(const int _thisStatIsDoubled, int& _defProposition, string& _luckDef, int& _attProposition, string& _luckAtt, int& _hpProposition, string& _luckHp)
