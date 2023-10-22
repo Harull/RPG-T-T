@@ -21,6 +21,7 @@ bool AskGameMode();
 void InfiniteGame();
 void HistoryGame();
 void DisplayDeath(const int _deadCounter, int& _coins);
+void SwitchLuck(const int _thisStatIsDoubled, int& _defProposition, string& _chanceDef, int& _attProposition, string& _chanceAtt, int& _hpProposition, string& _chanceHp);
 
 
 //Displays
@@ -56,103 +57,6 @@ bool GameChoose()
 		HistoryGame();//Jouer au mode histoire 
 	}
 	return 0;
-}
-
-
-
-void EnemyTakesDamage(int& _enemyHealth, const int _strenghtUser)
-{
-	_enemyHealth -= 10 + _strenghtUser * 5;
-	Clear();
-	DisplayEnemyTookDamage(10 + _strenghtUser * 5, _enemyHealth);
-}
-void EnemyDealsDamage(int _enemyStrenght, int& _healthUser, const int _defenseUser)
-{
-	Barr();
-	int _trueDamage = _enemyStrenght;
-	int _reducedDamage = _enemyStrenght * (1-_defenseUser*7.5 / 100); 
-
-	cout << "L'ennemi vous mets une bastoss (ouch ca doit faire mal), et vous prenez " << _trueDamage + _reducedDamage << " Degats" << endl;
-	_healthUser -= _trueDamage + _reducedDamage;
-	cout << "Il vous reste donc " << _healthUser << " HP"<<endl;
-	Barr();
-}
-bool IsDead(const int _health)
-{
-	if (_health <= 0) return true;
-	else return false;
-}
-void EnemyLevelsUp(int& _enemyLevel, int& _enemyStrenght, int& _enemyHealth)
-{
-	int _strenghtMultiplier = 1.5, _healthMultplier = 2 ;
-
-	_enemyLevel += 1;
-	_enemyStrenght += _enemyLevel * _strenghtMultiplier;
-	_enemyHealth += _enemyLevel * _healthMultplier;
-}
-void Say(string _toSay)
-{
-	cout << _toSay << endl;
-}
-void Barr()
-{
-	string _result;
-	for (int _index = 0; _index < 120; _index++)
-	{
-		_result += "\xCD";
-	}
-	cout << _result << endl << endl;
-}
-void Clear()
-{
-	system("cls");
-}
-void TypeSomethingToContinue(string& _forRandom)
-{
-	string _enter;
-	Say("<Type Something To Continue>");
-	cin >> _enter;
-	_forRandom += _enter; //On va se servir de ce paramètre dit "aléatoire" pour créer notre propre fonction random
-	Clear();
-}
-int RandomFromBagdad(string _strMultiplier, int _chosenRandom) //Donne un chiffre aléatoire entre 1 et x
-{
-	int _numChars = _strMultiplier.length();
-	int _formula = ((_numChars + 22) * (_numChars)-13);
-	return _formula % _chosenRandom + 1;
-}
-bool AskGameMode()//Return false si on choisi mode histoire, et true si mode vague infinie
-{
-	int _answer;
-	Barr();
-	Say("Choisissez votre mode de jeu ! ");
-	Say("1- Mode histoire (conseill\x82) \t 2- Mode Vague Infinie");
-	Barr();
-
-	bool _condition;
-	do
-	{
-		cin >> _answer;
-		cout << endl;
-		_condition = _answer != 1 && _answer != 2;
-		if (_condition)
-		{
-			Say("Votre reponse est incorrecte, choisissez votre mode de jeu en tappant 1 ou 2");
-		}
-	} while (_condition);
-	Clear();
-
-	return _answer - 1;
-}
-void DisplayDeath(const int _deadCounter,int& _coins)
-{
-	Barr();
-	Say("AHAHAHAHA TU ES MORT BOZO");
-	cout << "TU AS VAINCU EXACTEMENT " << _deadCounter << " ENNEMIS" << endl;
-	_coins = _deadCounter * 10;
-	cout << "Tu obtiens donc " << _coins << " W-Bucks, nous te conseillons de les utiliser a la boutique" << endl;
-	Say("Cela te permettra peut etre de vaincre plus d'ennemis !");
-	Barr();
 }
 void InfiniteGame()
 {
@@ -226,7 +130,104 @@ void HistoryGame()
 
 
 
+void EnemyTakesDamage(int& _enemyHealth, const int _strenghtUser)
+{
+	_enemyHealth -= 10 + _strenghtUser * 5;
+	Clear();
+	DisplayEnemyTookDamage(10 + _strenghtUser * 5, _enemyHealth);
+}
+void EnemyDealsDamage(int _enemyStrenght, int& _healthUser, const int _defenseUser)
+{
+	Barr();
+	int _trueDamage = _enemyStrenght;
+	int _reducedDamage = _enemyStrenght * (1-_defenseUser*7.5 / 100); 
 
+	cout << "L'ennemi vous mets une bastoss (ouch ca doit faire mal), et vous prenez " << _trueDamage + _reducedDamage << " Degats" << endl;
+	_healthUser -= _trueDamage + _reducedDamage;
+	cout << "Il vous reste donc " << _healthUser << " HP"<<endl;
+	Barr();
+}
+bool IsDead(const int _health)
+{
+	if (_health <= 0) return true;
+	else return false;
+}
+void EnemyLevelsUp(int& _enemyLevel, int& _enemyStrenght, int& _enemyHealth)
+{
+	int _strenghtMultiplier = 1.5, _healthMultplier = 2 ;
+
+	_enemyLevel += 1;
+	_enemyStrenght += _enemyLevel * _strenghtMultiplier;
+	_enemyHealth += _enemyLevel * _healthMultplier;
+}
+void Say(string _toSay)
+{
+	cout << _toSay << endl;
+}
+void Barr()
+{
+	string _result;
+	for (int _index = 0; _index < 120; _index++)
+	{
+		_result += "\xCD";
+	}
+	cout << _result << endl << endl;
+}
+void Clear()
+{
+	system("cls");
+}
+void TypeSomethingToContinue(string& _forRandom)
+{
+	string _enter;
+	Say("<Type Something To Continue>");
+	cin >> _enter;
+	_forRandom += _enter; //On va se servir de ce paramètre dit "aléatoire" pour créer notre propre fonction random
+	Clear();
+}
+int RandomFromBagdad(string _strMultiplier, int _modulo) //Donne un chiffre aléatoire entre 1 et x
+{
+	unsigned int _seed= _strMultiplier.length();
+	unsigned int _a = 1664525, _c = 1013904223;
+	return (_a * _seed + _c) % _modulo + 1;
+}
+bool AskGameMode()//Return false si on choisi mode histoire, et true si mode vague infinie
+{
+	int _answer;
+	Barr();
+	Say("Choisissez votre mode de jeu ! ");
+	Say("1- Mode histoire (conseill\x82) \t 2- Mode Vague Infinie");
+	Barr();
+
+	bool _condition;
+	do
+	{
+		cin >> _answer;
+		cout << endl;
+		_condition = _answer != 1 && _answer != 2;
+		if (_condition)
+		{
+			Say("Votre reponse est incorrecte, choisissez votre mode de jeu en tappant 1 ou 2");
+		}
+	} while (_condition);
+	Clear();
+
+	return _answer - 1;
+}
+
+
+
+
+void DisplayDeath(const int _deadCounter,int& _coins)
+{
+	Barr();
+	Say("AHAHAHAHA TU ES MORT BOZO");
+	cout << "TU AS VAINCU EXACTEMENT " << _deadCounter << " ENNEMIS" << endl;
+	_coins = _deadCounter * 10;
+	cout << "Tu obtiens donc " << _coins << " W-Bucks, nous te conseillons de les utiliser a la boutique" << endl;
+	Say("Cela te permettra peut etre de vaincre plus d'ennemis !");
+	Barr();
+}
 void DisplayWinRound()
 {
 	Barr();
@@ -322,37 +323,23 @@ void AskWitchStatAdd(int& _def, int& _att, int& _hp, string _forRandom)
 	int _statAdd;
 	Say("Tu es pass\x82 au niveau sup\x82rieur, tu peux choisir 2 stats a renforcer: ");
 
-	//Donne un chiffre pseudo-Aléatoire entre 1 et 3
-	int _thisStatIsDoubled = RandomFromBagdad(_forRandom, 3);
+	//Donne un chiffre pseudo-Aléatoire entre 1 et 6, tu as donc une chance sur 2 d'avoir un bonus chance, et 1 chance sur 3 d'avoir celui souhaité
+	int _thisStatIsDoubled = RandomFromBagdad(_forRandom, 6);
 	int _defProposition = 1, _attProposition = 1, _hpProposition = 15;
-	string _chanceDef="", _chanceAtt="", _chanceHp="";
-	//Fais fois 2 a la stats qui aura un bonus
-	switch (_thisStatIsDoubled)
-	{
-	case 1:
-		_defProposition *= 2;
-		_chanceDef = "(Bonus CHANCE)";
-		break;
-	case 2:
-		_attProposition *= 2;
-		_chanceAtt = "(Bonus CHANCE)";
-		break;
-	case 3:
-		_hpProposition += 10;
-		_chanceHp = "(Bonus CHANCE)";
-		break;
-	default:
-		break;
-	}
+	string _luckDef="", _luckAtt="", _luckHp="";
+	
+	//Pour attribuer le ("Chance") a la stat doublé, et double également la stat concernée
+	SwitchLuck(_thisStatIsDoubled, _defProposition, _luckDef, _attProposition, _luckAtt, _hpProposition, _luckHp);
+
 	for (int _index = 0; _index < 2; _index++)
 	{
 		Say("Quelle stat veux-tu augmenter ?");
 		DisplayStatsBetter(_def, _att, _hp);
-		cout << "1 : Defense +"<< _defProposition << " "  << _chanceDef<< endl;
-		cout << "2 : Attaque +"<< _attProposition << " " << _chanceAtt << endl;
-		cout << "3 : Vie +"<< _hpProposition << " " << _chanceHp <<endl;
+		cout << "1 : Defense +"<< _defProposition << " "  << _luckDef<< endl;
+		cout << "2 : Attaque +"<< _attProposition << " " << _luckAtt << endl;
+		cout << "3 : Vie +"<< _hpProposition << " " << _luckHp <<endl;
 
-		_chanceDef = "", _chanceAtt = "", _chanceHp = "";
+		_luckDef = "", _luckAtt = "", _luckHp = "";
 
 		cin >> _statAdd;
 		cout << endl;
@@ -372,10 +359,36 @@ void AskWitchStatAdd(int& _def, int& _att, int& _hp, string _forRandom)
 		}
 		else
 			_hp += _hpProposition;
-
-		_defProposition = 1, _attProposition = 1, _hpProposition = 15;
+		int _thisStatIsDoubled = RandomFromBagdad(_forRandom+"1", 6);
+		SwitchLuck(_thisStatIsDoubled, _defProposition, _luckDef, _attProposition, _luckAtt, _hpProposition, _luckHp);
 	}
 }
+
+void SwitchLuck(const int _thisStatIsDoubled, int& _defProposition, string& _luckDef, int& _attProposition, string& _luckAtt, int& _hpProposition, string& _luckHp)
+{
+	//Fais fois 2 a la stats qui aura un bonus
+	switch (_thisStatIsDoubled)
+	{
+	case 1:
+		_defProposition *= 2;
+		_luckDef = "(Bonus CHANCE)";
+		break;
+	case 2:
+		_attProposition *= 2;
+		_luckAtt = "(Bonus CHANCE)";
+		break;
+	case 3:
+		_hpProposition *= 2;
+		_luckHp = "(Bonus CHANCE)";
+		break;
+	default:
+		break;
+	}
+
+
+}
+
+
 
 void DisplayStats(const int _def, const int _att, const int _hp)
 {
